@@ -8,20 +8,29 @@ import (
 	"net/http"
 )
 
-// HelloWorld prints the JSON encoded "message" field in the body
-// of the request or "Hello, World!" if there isn't one.
-func HelloWorld(w http.ResponseWriter, r *http.Request) {
-	var d struct {
-		Message string `json:"message"`
+// Generates a random base64 number encoded into a URL-compatible string.
+func token() (string, error) {
+	var bytes [9]byte
+
+	_, err := rand.Read(bytes[:])
+	if err != nil {
+		return "", err
 	}
-	if err := json.NewDecoder(r.Body).Decode(&d); err != nil {
-		fmt.Fprint(w, "Hello World!")
-		return
-	}
-	if d.Message == "" {
-		fmt.Fprint(w, "Hello World!")
-		return
-	}
-	fmt.Fprint(w, html.EscapeString(d.Message))
+
+	return base64.URLEncoding.EncodeToString(bytes[:]), nil
+}
+
+func PostLink() {
+	// @todo
+}
+
+func GetLink(w http.ResponseWriter, r *http.Request) {
+	// @todo: check the database
+	// - if not exists, 404
+	// - if exists, redirect
+}
+
+func HandleRequest(w http.ResponseWriter, r *http.Request) {
+	http.Redirect(w, r, "https://google.com/search?q=redirection", 301)
 }
 
