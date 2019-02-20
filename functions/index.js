@@ -7,10 +7,16 @@ const validUrl = require('valid-url');
 
 // Constants and configuration
 const env = functions.config().shortlinks || {};
+// ...
 const TOKEN_LENGTH = 9; // bytes
 const KEYS = env.keys ? env.keys.split(',') : [];
 const HOSTNAME = env.hostname || 'https://fkit.io';
 const COLLECTION = env.collection || 'shortlinks';
+const REGION = 'asia-northeast1';
+const RUNTIME = {
+  timeoutSeconds: 30,
+  memory: '128MB'
+}
 
 // Prepare Cloud Firestore
 admin.initializeApp(functions.config().firebase);
@@ -131,12 +137,16 @@ const postHandler = functions.https.onRequest((req, res) => {
  * Default request handler. Detects the HTTP method and sends the request to either
  * GET or POST hanlder.
  */
-exports.handle = functions.https.onRequest((req, res) => {
-  switch (req.method) {
-    case 'GET':
-      return getHandler(req, res);
-    case 'POST':
-      return postHandler(req, res);
-  }
-  send404(res);
-});
+exports.handle = functions
+  .runWith(RUNTIME)
+  .region(REGION)
+  .https
+  .onRequest((req, res) => {
+    switch (req.method) {
+      case 'GET':
+        return getHandler(req, res);
+      case 'POST':
+        return postHandler(req, res);
+    }
+    send404(res);
+  });
