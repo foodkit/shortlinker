@@ -29,6 +29,19 @@ const validate = (url) => {
   return false;
 };
 
+const send = (res, code, message, contentType) => {
+  const response = res.status(code);
+  if (contentType) {
+    res.header('content-type', contentType);
+  }
+  response.send(message);
+};
+
+const send404 = (res) => {
+  res.status(404)
+    .send('Sorry, could not find that link.');
+};
+
 /**
  * Attempts to retrieve a shortlink from Firebase.
  */
@@ -71,19 +84,21 @@ const setShortlink = (url) => {
  */
 const getHandler = functions.https.onRequest((req, res) => {
   const token = req.url.substring(1);
-  getShortlink(token)
-    .then((longUrl) => {
-      if (longUrl) {
-        res.redirect(301, longUrl);
-      } else {
-        res.status(404)
-          .send('Sorry, could not find that link.');
-      }
-    }).catch((err) => {
-      console.error(err);
-      res.status(404)
-        .send('Sorry, could not find that link.');
-    });
+  if (token) {
+    getShortlink(token)
+      .then((longUrl) => {
+        if (longUrl) {
+          res.redirect(301, longUrl);
+        } else {
+          send404(res);
+        }
+      }).catch((err) => {
+        console.error(err);
+        send404(res);
+      });
+  } else {
+    send404(res);
+  }
 });
 
 /**
@@ -96,21 +111,15 @@ const postHandler = functions.https.onRequest((req, res) => {
 
   if (KEYS.indexOf(key) < 0) {
     // Authorization failed, invalid access token
-    res.status(401)
-      .header('content-type', 'application/json')
-      .send(JSON.stringify({message: 'Unauthorized.'}));
+    send(res, 401, JSON.stringify({message: 'Unauthorized.'}), 'application/json');
   } else if (!body || !body.long_url || !validate(body.long_url)) {
     // Request format is invalid
-    res.status(400)
-      .header('content-type', 'application/json')
-      .send(JSON.stringify({message: 'Invalid request format.'}));
+    send(res, 400, JSON.stringify({message: 'Invalid request format.'}), 'application/json');
   } else {
     // Create the shortlink:
     setShortlink(body.long_url)
       .then((token) => {
-        res.status(200)
-          .header('content-type', 'application/json')
-          .send(JSON.stringify({link: `${HOSTNAME}/${token}`}));
+        send(res, 200, JSON.stringify({link: `${HOSTNAME}/${token}`}), 'application/json');
       })
       .catch((err) => {
         console.error(err);
@@ -129,7 +138,5 @@ exports.handle = functions.https.onRequest((req, res) => {
     case 'POST':
       return postHandler(req, res);
   }
-
-  res.status(404)
-    .send('Sorry, that method or path is not supported.');
+  send404(res);
 });

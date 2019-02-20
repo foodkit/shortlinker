@@ -1,4 +1,4 @@
-# Shortlinks
+# Shortlinker
 
 Implements a basic Bit.ly style URL shortener using [Cloud Functions for Firebase](https://firebase.google.com/docs/functions/).
 
@@ -31,3 +31,7 @@ Content-Type: application/json
 HTTP/1.1 301 Moved Permanently
 Location: https://foodkit.io/some/long/url?with=optional_query_string_params
 ```
+
+## License
+
+See [LICENSE.md](LICENSE.md).
