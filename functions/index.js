@@ -6,10 +6,11 @@ const base64url = require('base64url');
 const validUrl = require('valid-url');
 
 // Constants and configuration
+const env = functions.config().shortlinks;
 const TOKEN_LENGTH = 9; // bytes
-const KEYS = process.env.KEYS ? process.env.KEYS.split(',') : [];
-const HOSTNAME = process.env.HOSTNAME || 'https://fkit.io';
-const COLLECTION = process.env.COLLECTION || 'shortlinks';
+const KEYS = env.keys ? env.keys.split(',') : [];
+const HOSTNAME = env.hostname || 'https://fkit.io';
+const COLLECTION = env.collection || 'shortlinks';
 
 // Prepare Cloud Firestore
 admin.initializeApp(functions.config().firebase);
