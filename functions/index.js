@@ -31,7 +31,7 @@ const validate = (url) => {
 /**
  * Attempts to retrieve a shortlink from Firebase.
  */
-const getShortlink = async (token) => {
+const getShortlink = (token) => {
   console.log('getting doc', token);
   return db.collection(COLLECTION)
   .doc(token)
@@ -52,7 +52,7 @@ const getShortlink = async (token) => {
 /**
  * Creates a shortlink document for the provided "long" URL.
  */
-const setShortlink = async (url) => {
+const setShortlink = (url) => {
   const token = randomToken();
   return db.collection(COLLECTION)
     .doc(token)
@@ -70,7 +70,7 @@ const setShortlink = async (url) => {
  * GET /*
  * Looks up a shortlink and redirects the request if the link was found.
  */
-exports.get = functions.https.onRequest((req, res) => {
+const getHandler = functions.https.onRequest((req, res) => {
   const token = req.url.substring(1);
   getShortlink(token)
     .then((longUrl) => {
@@ -91,7 +91,7 @@ exports.get = functions.https.onRequest((req, res) => {
  * POST /
  * Creates a shortlink.
  */
-exports.post = functions.https.onRequest((req, res) => {
+const postHandler = functions.https.onRequest((req, res) => {
   const key = (req.headers['authorization'] || '').replace('Bearer ', '');
   const body = req.body;
 
@@ -126,9 +126,9 @@ exports.post = functions.https.onRequest((req, res) => {
 exports.handle = functions.https.onRequest((req, res) => {
   switch (req.method) {
     case 'GET':
-      return this.get(req, res);
+      return getHandler(req, res);
     case 'POST':
-      return this.post(req, res);
+      return postHandler(req, res);
   }
 
   res.status(404)
