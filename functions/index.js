@@ -137,7 +137,7 @@ const postHandler = functions.https.onRequest((req, res) => {
  * Default request handler. Detects the HTTP method and sends the request to either
  * GET or POST hanlder.
  */
-exports.handle = functions
+exports.handleRequest = functions
   .runWith(RUNTIME)
   .region(REGION)
   .https
