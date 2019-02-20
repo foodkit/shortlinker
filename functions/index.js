@@ -6,7 +6,7 @@ const base64url = require('base64url');
 const validUrl = require('valid-url');
 
 // Constants and configuration
-const env = functions.config().shortlinks;
+const env = functions.config().shortlinks || {};
 const TOKEN_LENGTH = 9; // bytes
 const KEYS = env.keys ? env.keys.split(',') : [];
 const HOSTNAME = env.hostname || 'https://fkit.io';
@@ -33,21 +33,19 @@ const validate = (url) => {
  * Attempts to retrieve a shortlink from Firebase.
  */
 const getShortlink = (token) => {
-  console.log('getting doc', token);
   return db.collection(COLLECTION)
-  .doc(token)
-  .get()
-  .then((doc) => {
-    console.log('doc', doc);
-    if (doc.exists) {
-      return doc.data().long_url;
-    }
-    return false;
-  })
-  .catch((err) => {
-    console.error(err);
-    return false;
-  });
+    .doc(token || '')
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        return doc.data().long_url;
+      }
+      return false;
+    })
+    .catch((err) => {
+      console.error(err);
+      return false;
+    });
 };
 
 /**
@@ -109,14 +107,14 @@ const postHandler = functions.https.onRequest((req, res) => {
   } else {
     // Create the shortlink:
     setShortlink(body.long_url)
-    .then((token) => {
-      res.status(200)
-        .header('content-type', 'application/json')
-        .send(JSON.stringify({link: `${HOSTNAME}/${token}`}));
-    })
-    .catch((err) => {
-      console.error(err);
-    });
+      .then((token) => {
+        res.status(200)
+          .header('content-type', 'application/json')
+          .send(JSON.stringify({link: `${HOSTNAME}/${token}`}));
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   }
 });
 
