@@ -3,12 +3,7 @@
   "public": "public",
    "rewrites": [{
      "source": "**",
-     "function": "handleRequest"
-   }],
-   "ignore": [
-    "firebase.json",
-    "**/.*",
-    "**/node_modules/**"
-  ]
+     "function": "handle"
+   }]
  }
 }

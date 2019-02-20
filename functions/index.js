@@ -12,7 +12,8 @@ const TOKEN_LENGTH = 9; // bytes
 const KEYS = env.keys ? env.keys.split(',') : [];
 const HOSTNAME = env.hostname || 'https://fkit.io';
 const COLLECTION = env.collection || 'shortlinks';
-const REGION = 'asia-northeast1';
+// See: https://firebase.google.com/docs/functions/locations
+const REGION = 'us-central1';
 const RUNTIME = {
   timeoutSeconds: 30,
   memory: '128MB'
@@ -137,7 +138,7 @@ const postHandler = functions.https.onRequest((req, res) => {
  * Default request handler. Detects the HTTP method and sends the request to either
  * GET or POST hanlder.
  */
-exports.handleRequest = functions
+exports.handle = functions
   .runWith(RUNTIME)
   .region(REGION)
   .https
