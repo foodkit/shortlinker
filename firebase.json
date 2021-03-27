@@ -5,5 +5,8 @@
      "source": "**",
      "function": "handle"
    }]
+ },
+ "functions": {
+  "runtime": "nodejs12"
  }
 }

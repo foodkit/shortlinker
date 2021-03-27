@@ -9,6 +9,7 @@ const validUrl = require('valid-url');
 const env = functions.config().shortlinks || {};
 // ...
 const TOKEN_LENGTH = 9; // bytes
+// env var `key` should be 1 valid bearer token or a comma delimited list of acceptable bearer tokens:
 const KEYS = env.keys ? env.keys.split(',') : [];
 const HOSTNAME = env.hostname || 'https://fkit.io';
 const COLLECTION = env.collection || 'shortlinks';
